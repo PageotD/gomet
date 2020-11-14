@@ -3,6 +3,7 @@ genetic_algorithm: A Genetic Algorithm optimization as described in
 Global Optimization Methods In Geophysical Inversion, Sen & Stoffa (2013)
 """
 
+import math
 import numpy as np
 from scipy.optimize import OptimizeResult
 from scipy.optimize.optimize import _status_message
@@ -36,6 +37,51 @@ def genetic_algorithm(func, bounds, funcargs=(), selection='fitest',
     
     pass
 
+class GeneticAlgorithm():
+   
+    def __init__(self, func, bounds, population, iteration, 
+                 selection, crossover, mutation):
+        
+        # Initiate class
+        self.bounds = bounds
+        self.population = population
+        self.iteration = iteration
+        self.selection = selection
+        self.crossover = crossover
+        self.mutation = mutation
+        
+    def _power2(self, n):
+        """
+        Search the next highest power of 2 of an integer value.
+
+        :param n: "targeted" integer
+        """
+        
+        # Get the log of n in base 2 and get the smallest integer greater than
+        # or equal to n
+        npower = math.ceil(math.log(n, 2))
+        
+        # Return the next power of 2
+        return int(math.pow(2, npower))
+    
+    def _gene_lenght(self, n):
+        """
+        Return the maximum lenght of a bit-string given n (power of 2).
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        # Get the next highest power of 2
+        npw = self._power2(n)
+
+        # Calculate the maximum lenght of the bit-string
+        l = 1./np.log(2.)*np.log(float(npw))
+        
+        return l
+        
 class Genalg():
     """
     Genetic Algorithm class
