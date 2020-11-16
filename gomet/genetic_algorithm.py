@@ -10,6 +10,12 @@ from scipy.optimize.optimize import _status_message
 
 from scipy._lib._util import check_random_state
 
+param = {'population': 100,
+         'iterations': 100,
+         'selection': 'fitest',
+         'mutation': 'standard',
+         'crossover': 'standard'}
+
 def genetic_algorithm(func, bounds, funcargs=(), selection='fitest',
                       mutation='standard', crossover='standard'):
     """
@@ -38,7 +44,24 @@ def genetic_algorithm(func, bounds, funcargs=(), selection='fitest',
     pass
 
 class GeneticAlgorithm():
-   
+    """
+    A standard Genetic Algorithm implementation according to 
+    Sen & Stoffa (1992), Sambridge & Gallagher (1993), 
+    Gallagher & Sambridge (1994).
+    
+    Gallagher, K. & Sambridge, M. Genetic algorithms: a powerful tool for 
+        large-scale nonlinear optimization problems Computers & Geosciences, 
+        Elsevier, 1994, 20, 1229-1236
+    
+    Sambridge, M. & Gallagher, K. Earthquake hypocenter location using genetic
+        algorithms Bulletin of the Seismological Society of America, 
+        Seismological Society of America, 1993, 83, 1467-1491
+    
+    Sen, M. K. & Stoffa, P. L. Rapid sampling of model space using genetic 
+        algorithms: examples from seismic waveform inversion Geophysical 
+        Journal International, Oxford University Press, 1992, 108, 281-292
+    """
+    
     def __init__(self, func, bounds, population, iteration, 
                  selection, crossover, mutation):
         
@@ -54,7 +77,16 @@ class GeneticAlgorithm():
         """
         Search the next highest power of 2 of an integer value.
 
-        :param n: "targeted" integer
+        Parameters
+        ----------
+        n : int
+            Integer value.
+
+        Returns
+        -------
+        int
+            Next highest power of 2 of n.
+
         """
         
         # Get the log of n in base 2 and get the smallest integer greater than
@@ -81,6 +113,62 @@ class GeneticAlgorithm():
         l = 1./np.log(2.)*np.log(float(npw))
         
         return l
+        
+    def _initialize_pool(self):
+        """
+        Initialize the chromosome pool.
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        # Get the number of points and the number of dimensions per points
+        # number_of_points * number_of_dimensions = number_of_unknowns
+        self.npoints = self.bounds.shape[0]
+        self.ndimensions = self.bounds.shape[1]
+
+        # Set the chromosome lenghts (number of unknowns)
+        self.chromolenght = self.npoints * self.ndimensions
+
+
+        # Initialize population and misfit
+        self.current = []
+        self.misfit = []
+        
+        # Loop over chromosome
+        for indv in range(population):
+            # Loop over points and dimensions
+            for ipts in range(self.npoints):
+                for idim in range(self.ndimensions):
+                    (vmin, vmax) = bounds[ipts][idim]
+                    
+        ######
+        ######
+        ######
+        ######
+        ######
+        
+        # Initiliaze random model
+        rmod = np.zeros((npts, npar), dtype=np.float32)
+
+        # Loop over individuals
+        for indv in range(0, nindv):
+            # Loop over points and parameters
+            for ipts in range(0, npts):
+                for ipar in range(0, npar):
+                    vmin = self.pspace[ipts, ipar, 0]
+                    vmax = self.pspace[ipts, ipar, 1]
+                    nv = self.pspace[ipts, ipar, 2]
+                    if nv > 1:
+                        # Randomize
+                        r = np.random.randint(0, high=nv)
+                        rmod[ipts, ipar] = vmin+r*(vmax-vmin)/float(nv-1)
+                    else:
+                        rmod[ipts, ipar] = vmin
+            # Write genes in chromosomes
+            self.current[indv, :] = self.chromowrite(rmod)
         
 class Genalg():
     """
