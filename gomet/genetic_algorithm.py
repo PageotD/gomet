@@ -96,23 +96,22 @@ class GeneticAlgorithm():
         # Return the next power of 2
         return int(math.pow(2, npower))
     
-    def _gene_lenght(self, n):
+    def _integer2binary(self, rgene, nsamples):
         """
-        Return the maximum lenght of a bit-string given n (power of 2).
-
-        Returns
-        -------
-        None.
+        Return the gene (integer) in binary format with the appropriate lenght
 
         """
-        
-        # Get the next highest power of 2
-        npw = self._power2(n)
 
         # Calculate the maximum lenght of the bit-string
-        l = 1./np.log(2.)*np.log(float(npw))
+        # Old version : nelements = 1./np.log(2.)*np.log(float(nsamples))
+        nelements = len(np.binary_repr(nsamples-1))
         
-        return l
+        # Convert the gene in binary format
+        np.binary_repr(rgene, width=nelements)
+        
+        self.gene_len.append(nelements)
+        self.current
+        return bgene
         
     def _initialize_pool(self):
         """
@@ -124,26 +123,26 @@ class GeneticAlgorithm():
 
         """
         
-        # Get the number of points and the number of dimensions per points
-        # number_of_points * number_of_dimensions = number_of_unknowns
-        self.npoints = self.bounds.shape[0]
-        self.ndimensions = self.bounds.shape[1]
-
-        # Set the chromosome lenghts (number of unknowns)
-        self.chromolenght = self.npoints * self.ndimensions
-
+        # Get the number of genes from bounds
+        self.ngenes = len(self.bounds)
 
         # Initialize population and misfit
         self.current = []
         self.misfit = []
         
-        # Loop over chromosome
-        for indv in range(population):
-            # Loop over points and dimensions
-            for ipts in range(self.npoints):
-                for idim in range(self.ndimensions):
-                    (vmin, vmax) = bounds[ipts][idim]
-                    
+        # Loop over chromosomes in population
+        for ichromo in range(self.population):
+            # Loop over number of genes
+            for igene in range(self.ngenes):
+                # Get the corresponding bounds and number of samples
+                (bmin, bmax, nsamples) = bounds[igene]
+                # Check if the number of samples is a power of 2
+                self._power2(nsamples)
+                # Draw an integer at random in [0, nsamples]
+                rgene = np.random.randint(0, high=nsamples)
+                # Convert in binary format with the appropriate lenght
+                self._integer2binary(rgene, nsamples)
+                
         ######
         ######
         ######
