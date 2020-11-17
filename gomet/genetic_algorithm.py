@@ -107,10 +107,8 @@ class GeneticAlgorithm():
         nelements = len(np.binary_repr(nsamples-1))
         
         # Convert the gene in binary format
-        np.binary_repr(rgene, width=nelements)
-        
-        self.gene_len.append(nelements)
-        self.current
+        bgene = np.binary_repr(rgene, width=nelements)
+
         return bgene
         
     def _initialize_pool(self):
@@ -132,42 +130,27 @@ class GeneticAlgorithm():
         
         # Loop over chromosomes in population
         for ichromo in range(self.population):
+            # Initialise gene_list
+            chromosome = None
             # Loop over number of genes
             for igene in range(self.ngenes):
                 # Get the corresponding bounds and number of samples
-                (bmin, bmax, nsamples) = bounds[igene]
+                (bmin, bmax, nsamples) = self.bounds[igene]
                 # Check if the number of samples is a power of 2
                 self._power2(nsamples)
                 # Draw an integer at random in [0, nsamples]
                 rgene = np.random.randint(0, high=nsamples)
                 # Convert in binary format with the appropriate lenght
-                self._integer2binary(rgene, nsamples)
-                
-        ######
-        ######
-        ######
-        ######
-        ######
-        
-        # Initiliaze random model
-        rmod = np.zeros((npts, npar), dtype=np.float32)
-
-        # Loop over individuals
-        for indv in range(0, nindv):
-            # Loop over points and parameters
-            for ipts in range(0, npts):
-                for ipar in range(0, npar):
-                    vmin = self.pspace[ipts, ipar, 0]
-                    vmax = self.pspace[ipts, ipar, 1]
-                    nv = self.pspace[ipts, ipar, 2]
-                    if nv > 1:
-                        # Randomize
-                        r = np.random.randint(0, high=nv)
-                        rmod[ipts, ipar] = vmin+r*(vmax-vmin)/float(nv-1)
-                    else:
-                        rmod[ipts, ipar] = vmin
-            # Write genes in chromosomes
-            self.current[indv, :] = self.chromowrite(rmod)
+                bgene = self._integer2binary(rgene, nsamples)
+                # Add gene to the gene list
+                gene_list.append(bgene)
+                # Concatenate genes
+                if chromosome == None:
+                    chromosome = bgene
+                else:
+                    chromosome = ':' + bgene
+            # Add chromosome to the current pool
+            self.current.append(chromosome)
         
 class Genalg():
     """
