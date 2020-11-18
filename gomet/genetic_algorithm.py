@@ -10,38 +10,6 @@ from scipy.optimize.optimize import _status_message
 
 from scipy._lib._util import check_random_state
 
-param = {'population': 100,
-         'iterations': 100,
-         'selection': 'fitest',
-         'mutation': 'standard',
-         'crossover': 'standard'}
-
-def genetic_algorithm(func, bounds, funcargs=(), selection='fitest',
-                      mutation='standard', crossover='standard'):
-    """
-
-    Parameters
-    ----------
-    func : TYPE
-        DESCRIPTION.
-    bounds : TYPE
-        DESCRIPTION.
-    funcargs : TYPE, optional
-        DESCRIPTION. The default is ().
-    selection : TYPE, optional
-        DESCRIPTION. The default is 'fitest'.
-    mutation : TYPE, optional
-        DESCRIPTION. The default is 'standard'.
-    crossover : TYPE, optional
-        DESCRIPTION. The default is 'standard'.
-
-    Returns
-    -------
-    None.
-
-    """
-    
-    pass
 
 class GeneticAlgorithm():
     """
@@ -62,8 +30,9 @@ class GeneticAlgorithm():
         Journal International, Oxford University Press, 1992, 108, 281-292
     """
     
-    def __init__(self, func, bounds, population, iteration, 
-                 selection, crossover, mutation):
+    def __init__(self, func, bounds, population=100, iteration=100, 
+                 selection='tournament', crossover='simple', 
+                 mutation='standard'):
         
         # Initiate class
         self.bounds = bounds
