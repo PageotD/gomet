@@ -33,8 +33,16 @@ class TestGeneticAlgorithm:
     # ------------------------------------------------------------------------
     def test_initialization(self):
         bounds = [(-1, 1), (-1, 1)]
-        ga.__init__(self, func=rosen, bounds=bounds)
-        assert(self.bounds == bounds)
+        ga2 = ga(func=rosen, bounds=bounds)
+        assert(ga2.bounds == bounds)
+        
+    def test_initialization_modes(self):
+        bounds = [(-1, 1), (-1, 1)]
+        ga2 = ga(func=rosen, bounds=bounds, selection='TourNaMEnt',
+                 crossover='sIMplE', mutation='LINEAR')
+        assert(ga2._selection == 'tournament')
+        assert(ga2._crossover == 'simple')
+        assert(ga2._mutation == 'linear')
         
     # ------------------------------------------------------------------------
     # >> NEAREST POWER OF TWO

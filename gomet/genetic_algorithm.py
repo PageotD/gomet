@@ -17,16 +17,16 @@ class GeneticAlgorithm():
     Gallagher & Sambridge (1994).
     
     Gallagher, K. & Sambridge, M. Genetic algorithms: a powerful tool for 
-        large-scale nonlinear optimization problems Computers & Geosciences, 
-        Elsevier, 1994, 20, 1229-1236
+    large-scale nonlinear optimization problems Computers & Geosciences, 
+    Elsevier, 1994, 20, 1229-1236
     
     Sambridge, M. & Gallagher, K. Earthquake hypocenter location using genetic
-        algorithms Bulletin of the Seismological Society of America, 
-        Seismological Society of America, 1993, 83, 1467-1491
+    algorithms Bulletin of the Seismological Society of America, 
+    Seismological Society of America, 1993, 83, 1467-1491
     
     Sen, M. K. & Stoffa, P. L. Rapid sampling of model space using genetic 
-        algorithms: examples from seismic waveform inversion Geophysical 
-        Journal International, Oxford University Press, 1992, 108, 281-292
+    algorithms: examples from seismic waveform inversion Geophysical 
+    Journal International, Oxford University Press, 1992, 108, 281-292
     """
     
     # ------------------------------------------------------------------------
@@ -44,14 +44,30 @@ class GeneticAlgorithm():
     def __init__(self, func, bounds, population=100, iteration=100, 
                  selection='tournament', crossover='simple', 
                  mutation='standard'):
-        
+
         # Initiate class
+        self.func = func 
         self.bounds = bounds
         self.population = population
         self.iteration = iteration
-        self.selection = selection
-        self.crossover = crossover
-        self.mutation = mutation
+        
+        # Check selection mode
+        if selection.lower() in self._selection_modes:
+            self._selection = selection.lower()
+        else:
+            raise ValueError("Please select a valid selection strategy")
+        
+        # Check crossover mode
+        if crossover.lower() in self._crossover_modes:
+            self._crossover = crossover.lower()
+        else:
+            raise ValueError("Please select a valid crossover strategy")
+            
+        # Check crossover mode
+        if mutation.lower() in self._mutation_modes:
+            self._mutation = mutation.lower()
+        else:
+            raise ValueError("Please select a valid mutation strategy")
         
     # ------------------------------------------------------------------------
     # >> NEAREST POWER OF 2
@@ -132,8 +148,6 @@ class GeneticAlgorithm():
                 rgene = np.random.randint(0, high=nsamples)
                 # Convert in binary format with the appropriate lenght
                 bgene = self._integer2binary(rgene, nsamples)
-                # Add gene to the gene list
-                gene_list.append(bgene)
                 # Concatenate genes
                 if chromosome == None:
                     chromosome = bgene
