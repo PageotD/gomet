@@ -10,6 +10,9 @@ from scipy.optimize.optimize import _status_message
 
 from scipy._lib._util import check_random_state
 
+_selection_modes = ['tournament', 'roulette']
+_crossover_modes = ['simple', 'multiple']
+_mutation_modes  = ['standard', 'linear', 'exponential']
 
 class GeneticAlgorithm():
     """
@@ -42,9 +45,9 @@ class GeneticAlgorithm():
         self.crossover = crossover
         self.mutation = mutation
         
-    def _power2(self, n):
+    def _nearest_power2(self, n):
         """
-        Search the next highest power of 2 of an integer value.
+        Search the nearest power of 2 of an integer value.
 
         Parameters
         ----------
@@ -54,13 +57,14 @@ class GeneticAlgorithm():
         Returns
         -------
         int
-            Next highest power of 2 of n.
+            Nearest power of 2 of n.
 
         """
         
         # Get the log of n in base 2 and get the smallest integer greater than
         # or equal to n
-        npower = math.ceil(math.log(n, 2))
+        #npower = math.ceil(math.log(n, 2))
+        npower = round(math.log(n, 2))
         
         # Return the next power of 2
         return int(math.pow(2, npower))
@@ -106,7 +110,7 @@ class GeneticAlgorithm():
                 # Get the corresponding bounds and number of samples
                 (bmin, bmax, nsamples) = self.bounds[igene]
                 # Check if the number of samples is a power of 2
-                self._power2(nsamples)
+                self._nearest_power2(nsamples)
                 # Draw an integer at random in [0, nsamples]
                 rgene = np.random.randint(0, high=nsamples)
                 # Convert in binary format with the appropriate lenght
