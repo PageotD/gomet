@@ -13,12 +13,25 @@ from gomet.genetic_algorithm import GeneticAlgorithm as ga
 class TestGeneticAlgorithm:
     
     # ------------------------------------------------------------------------
+    # >> MODE AVALAIBLES
+    # ------------------------------------------------------------------------
+    def test_selection_modes(self):
+        assert('tournament' in ga._selection_modes)
+        assert('roulette' in ga._selection_modes)
+        
+    def test_crossover_modes(self):
+        assert('simple' in ga._crossover_modes)
+        assert('multiple' in ga._crossover_modes)
+        
+    def test_mutation_modes(self):
+        assert('standard' in ga._mutation_modes)
+        assert('linear' in ga._mutation_modes)
+        assert('exponential' in ga._mutation_modes)
+        
+    # ------------------------------------------------------------------------
     # >> INITIALIZATION
     # ------------------------------------------------------------------------
     def test_initialization(self):
-        gaparam = {
-            'population': 100,
-            'iteration': 100}
         bounds = [(-1, 1), (-1, 1)]
         ga.__init__(self, func=rosen, bounds=bounds)
         assert(self.bounds == bounds)

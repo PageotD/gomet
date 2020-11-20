@@ -10,10 +10,6 @@ from scipy.optimize.optimize import _status_message
 
 from scipy._lib._util import check_random_state
 
-_selection_modes = ['tournament', 'roulette']
-_crossover_modes = ['simple', 'multiple']
-_mutation_modes  = ['standard', 'linear', 'exponential']
-
 class GeneticAlgorithm():
     """
     A standard Genetic Algorithm implementation according to 
@@ -33,6 +29,18 @@ class GeneticAlgorithm():
         Journal International, Oxford University Press, 1992, 108, 281-292
     """
     
+    # ------------------------------------------------------------------------
+    # >> Define avalaible selection modes, crossover modes and mutation modes 
+    #    in lists
+    # ------------------------------------------------------------------------
+    _selection_modes = ['tournament', 'roulette']
+    _crossover_modes = ['simple', 'multiple']
+    _mutation_modes  = ['standard', 'linear', 'exponential']
+
+    
+    # ------------------------------------------------------------------------
+    # >> INITIALIZE
+    # ------------------------------------------------------------------------
     def __init__(self, func, bounds, population=100, iteration=100, 
                  selection='tournament', crossover='simple', 
                  mutation='standard'):
@@ -45,6 +53,9 @@ class GeneticAlgorithm():
         self.crossover = crossover
         self.mutation = mutation
         
+    # ------------------------------------------------------------------------
+    # >> NEAREST POWER OF 2
+    # ------------------------------------------------------------------------
     def _nearest_power2(self, n):
         """
         Search the nearest power of 2 of an integer value.
@@ -69,6 +80,9 @@ class GeneticAlgorithm():
         # Return the next power of 2
         return int(math.pow(2, npower))
     
+    # ------------------------------------------------------------------------
+    # >> INTEGER TO BINARY CONVERSION
+    # ------------------------------------------------------------------------
     def _integer2binary(self, rgene, nsamples):
         """
         Return the gene (integer) in binary format with the appropriate lenght
@@ -84,6 +98,9 @@ class GeneticAlgorithm():
 
         return bgene
         
+    # ------------------------------------------------------------------------
+    # >> INITIALIZE CHROMOSOME POOL
+    # ------------------------------------------------------------------------
     def _initialize_pool(self):
         """
         Initialize the chromosome pool.
