@@ -46,11 +46,25 @@ class GeneticAlgorithm():
                  mutation='standard'):
 
         # Initiate class
-        self.func = func 
-        self.bounds = bounds
-        self.population = population
+        self.func = func
         self.iteration = iteration
-        
+        self.bounds = bounds
+          
+        # Check bounds
+        if isinstance(bounds, list):
+            if isinstance(bounds[0], tuple) and len(bounds[0]) != 3:
+                raise Exception("bounds must be a tuple or a list of tuples (min, max number of samples)")
+        elif isinstance(bounds, tuple) and len(bounds) != 3:
+            raise Exception("bounds must be a tuple or a list of tuples (min, max number of samples)")
+        else:
+            self.bounds = bounds
+            
+        # Check population
+        if (population % 2 == 0 and population >= 2):
+            self.population = population
+        else:
+            raise ValueError("Population must be a multiple of 2 and >= 2")
+            
         # Check selection mode
         if selection.lower() in self._selection_modes:
             self._selection = selection.lower()
@@ -74,7 +88,7 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     def _nearest_power2(self, n):
         """
-        Search the nearest power of 2 of an integer value.
+        Get the nearest power of 2 of an integer value.
 
         Parameters
         ----------
@@ -84,13 +98,11 @@ class GeneticAlgorithm():
         Returns
         -------
         int
-            Nearest power of 2 of n.
+            Nearest power of 2.
 
         """
         
-        # Get the log of n in base 2 and get the smallest integer greater than
-        # or equal to n
-        #npower = math.ceil(math.log(n, 2))
+        # Get the log of n in base 2 and get the closest integer to n
         npower = round(math.log(n, 2))
         
         # Return the next power of 2
@@ -128,7 +140,10 @@ class GeneticAlgorithm():
         """
         
         # Get the number of genes from bounds
-        self.ngenes = len(self.bounds)
+        if isinstance(self.bounds, list):
+            self.ngenes = len(self.bounds)
+        else:
+            self.ngenes = 1
 
         # Initialize population and misfit
         self.current = []
@@ -137,24 +152,25 @@ class GeneticAlgorithm():
         # Loop over chromosomes in population
         for ichromo in range(self.population):
             # Initialise gene_list
-            chromosome = None
+            chromosome = []
             # Loop over number of genes
             for igene in range(self.ngenes):
                 # Get the corresponding bounds and number of samples
-                (bmin, bmax, nsamples) = self.bounds[igene]
+                if isinstance(self.bounds, list):
+                    (bmin, bmax, nsamples) = self.bounds[igene]
+                else:
+                    (bmin, bmax, nsamples) = self.bounds
                 # Check if the number of samples is a power of 2
                 self._nearest_power2(nsamples)
                 # Draw an integer at random in [0, nsamples]
                 rgene = np.random.randint(0, high=nsamples)
                 # Convert in binary format with the appropriate lenght
                 bgene = self._integer2binary(rgene, nsamples)
-                # Concatenate genes
-                if chromosome == None:
-                    chromosome = bgene
-                else:
-                    chromosome = ':' + bgene
+                chromosome.append(bgene)
+                
             # Add chromosome to the current pool
-            self.current.append(chromosome)
+            self.current.append(':'.join(chromosome))
+        print(self.current)
         
 class Genalg():
     """
