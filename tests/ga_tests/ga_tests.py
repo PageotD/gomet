@@ -33,7 +33,7 @@ class TestGeneticAlgorithm:
     # ------------------------------------------------------------------------
     def test_initialization(self):
         bounds = [(-10, 10, 32), (-10, 10, 32)]
-        ga2 = ga(rosen, bounds, population=100)
+        ga2 = ga(rosen, bounds, popsize=100)
         assert(ga2.bounds == bounds)
         
     def test_initialization_strategies(self):
@@ -43,17 +43,17 @@ class TestGeneticAlgorithm:
         assert(ga2._selection == 'tournament')
         assert(ga2._crossover == 'simple')
         assert(ga2._mutation == 'linear')
-        assert(ga2.population == 100)
+        assert(ga2.popsize == 100)
         
-    def test_initialization_population(self):
+    def test_initialization_popsize(self):
         bounds = [(-10, 10, 32), (-10, 10, 32)]
-        ga2 = ga(rosen, bounds, population=500)
-        assert(ga2.population == 500)
+        ga2 = ga(rosen, bounds, popsize=500)
+        assert(ga2.popsize == 500)
      
-    def test_initialization_iteration(self):
+    def test_initialization_maxiter(self):
         bounds = [(-10, 10, 32), (-10, 10, 32)]
-        ga2 = ga(rosen, bounds, iteration=200)
-        assert(ga2.iteration == 200)
+        ga2 = ga(rosen, bounds, maxiter=200)
+        assert(ga2.maxiter == 200)
         
     # ------------------------------------------------------------------------
     # >> NEAREST POWER OF TWO
@@ -72,6 +72,14 @@ class TestGeneticAlgorithm:
         assert(ga._integer2binary(self, 255, 256) == '11111111')
 
     # ------------------------------------------------------------------------
+    # >> BINARY TO INTEGER CONVERSION
+    # ------------------------------------------------------------------------
+    def test_binary2integer(self):
+        assert(ga._binary2integer(self, '00000000') == 0)
+        assert(ga._binary2integer(self, '00101100') == 44)
+        assert(ga._binary2integer(self, '11111111') == 255)
+        
+    # ------------------------------------------------------------------------
     # >> INITIALIZE CHROMOSOME POOL
     # ------------------------------------------------------------------------
     def test_initialize_pool(self):
@@ -82,7 +90,7 @@ class TestGeneticAlgorithm:
                   '00011:00111:01001', 
                   '10011:10101:10010']
         bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
-        ga2 = ga(rosen, bounds, population=4)
+        ga2 = ga(rosen, bounds, popsize=4)
         ga2._initialize_pool()
         assert(ga2.current == output)
         

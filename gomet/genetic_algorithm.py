@@ -41,13 +41,14 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> INITIALIZE
     # ------------------------------------------------------------------------
-    def __init__(self, func, bounds, population=100, iteration=100, 
+    def __init__(self, func, bounds, fargs=(), popsize=100, maxiter=100, 
                  selection='tournament', crossover='simple', 
                  mutation='standard'):
-
+       
         # Initiate class
         self.func = func
-        self.iteration = iteration
+        self.fargs = fargs
+        self.maxiter = maxiter
         self.bounds = bounds
           
         # Check bounds
@@ -60,8 +61,8 @@ class GeneticAlgorithm():
             self.bounds = bounds
             
         # Check population
-        if (population % 2 == 0 and population >= 2):
-            self.population = population
+        if (popsize % 2 == 0 and popsize >= 2):
+            self.popsize = popsize
         else:
             raise ValueError("Population must be a multiple of 2 and >= 2")
             
@@ -125,7 +126,21 @@ class GeneticAlgorithm():
         bgene = np.binary_repr(rgene, width=nelements)
 
         return bgene
+    
+    # ------------------------------------------------------------------------
+    # >> BINARY TO INTEGER CONVERSION
+    # ------------------------------------------------------------------------
+    def _binary2integer(self, bingene):
+        """
+        Return the integer value of a binary string
+
+        """
         
+        # Convert the gene in integer
+        intgene = np.int(bingene, 2)
+
+        return intgene
+    
     # ------------------------------------------------------------------------
     # >> INITIALIZE CHROMOSOME POOL
     # ------------------------------------------------------------------------
@@ -150,7 +165,7 @@ class GeneticAlgorithm():
         self.misfit = []
         
         # Loop over chromosomes in population
-        for ichromo in range(self.population):
+        for ichromo in range(self.popsize):
             # Initialise gene_list
             chromosome = []
             # Loop over number of genes
@@ -170,7 +185,50 @@ class GeneticAlgorithm():
                 
             # Add chromosome to the current pool
             self.current.append(':'.join(chromosome))
-        print(self.current)
+       
+    # ------------------------------------------------------------------------
+    # >> SELECTION STRATEGIES
+    # ------------------------------------------------------------------------
+    def _tournament_selection(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    def _roulette_selection(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    # ------------------------------------------------------------------------
+    # >> CROSSOVER STRATEGIES
+    # ------------------------------------------------------------------------
+    def _simple_crossover(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    def _multiple_crossover(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    # ------------------------------------------------------------------------
+    # >> MUTATION STRATEGIES
+    # ------------------------------------------------------------------------
+    def _standard_mutation(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    def _linear_mutation(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    def _exponential_mutation(self):
+        raise NotImplementedError("This function is not implemented yet.")
+    
+    # ------------------------------------------------------------------------
+    # >> SOLVE
+    # ------------------------------------------------------------------------
+    def solve(self):
+        # Generate pool
+        self._initialize_pool()
+        # Convert binary chromosomes into real values
+        # Evaluate chromosomes using the external function
+        # Loop over iteration
+            # Selection
+            # Crossover
+            # Mutation
+            # Evaluate chromosomes using the external function
         
 class Genalg():
     """
