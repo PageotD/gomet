@@ -187,10 +187,11 @@ class GeneticAlgorithm():
             self.current.append(':'.join(chromosome))
        
     # ------------------------------------------------------------------------
-    # >> CHROMOSOME EVALUATION
+    # >> EVALUATE POOL
     # ------------------------------------------------------------------------
     def _evaluate_pool(self):
         # Loop over chromosomes
+        self.fitness = []
         for ipop in range(self.popsize):
             # Split chromosome in genes
             genes = self.current[ipop].split(':')
@@ -201,7 +202,8 @@ class GeneticAlgorithm():
                 value = bmin+int(genes[igene], 2)/(bsamp-1)*(bmax-bmin)
                 param.append(value)
             # Evaluate chromosomes using the external function
-            pass
+            result = self.func(param, self.fargs)
+            self.fitness.append(result)
     
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
