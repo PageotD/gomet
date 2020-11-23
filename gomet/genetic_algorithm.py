@@ -42,15 +42,17 @@ class GeneticAlgorithm():
     # >> INITIALIZE
     # ------------------------------------------------------------------------
     def __init__(self, func, bounds, fargs=(), popsize=100, maxiter=100, 
-                 selection='tournament', crossover='simple', 
-                 mutation='standard'):
+                 selection='tournament', crossover='simple', pc=0.2, 
+                 mutation='standard', pm=0.05):
        
         # Initiate class
         self.func = func
         self.fargs = fargs
         self.maxiter = maxiter
         self.bounds = bounds
-          
+        self.pc = pc
+        self.pm = pm
+        
         # Check bounds
         if isinstance(bounds, list):
             if isinstance(bounds[0], tuple) and len(bounds[0]) != 3:
@@ -212,7 +214,17 @@ class GeneticAlgorithm():
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
     def _tournament_selection(self):
-        raise NotImplementedError("This function is not implemented yet.")
+        # Chose two challengers in the pool
+        challenger1 = np.random.random(0, self.popsize)
+        challenger2 = challenger1
+        while challenger1 == challenger2:
+            challenger2 = np.random.random(0, self.popsize)
+        # Tournament
+        if self.fitness[challenger1] < self.fitness[challenger2]:
+            selected = self.current[challenger1]
+        else:
+            selected = self.current[challenger2]
+        return selected
     
     def _roulette_selection(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -220,8 +232,12 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> CROSSOVER STRATEGIES
     # ------------------------------------------------------------------------
-    def _simple_crossover(self):
-        raise NotImplementedError("This function is not implemented yet.")
+    def _simple_crossover(self, children1, children2):
+        if np.random.random_sample() < self.pc:
+            # Determine the crossover point
+            icross = np.random.randint(0, len(children1))
+            children1[icross:], children2[icross:] = \
+                children2[icross:], children1[icross:]
     
     def _multiple_crossover(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -248,7 +264,22 @@ class GeneticAlgorithm():
         self._evaluate_pool()
         # Loop over iteration
         for iteration in range(self.maxiter):
-            # Selection
-            # Crossover
-            # Mutation
+            # New generation
+            new_generation = []
+            for i in range(self.pop.size/2):
+                # Selection
+                parent1 = self._tournament_selection()
+                parent2 = self._tournament_selection()
+                # Crossover
+                children1 = None
+                children2 = None
+                # Mutation
+                children1 = None
+                children2 = None
+                # New generation
+                new_generation.append(children1)
+                new_generation.append(children2)
+            # New generation becomes the current generation
+            self.current = new_generation[:]
+            # Evaluate chromosome using the external function
             self._evaluate_pool()
