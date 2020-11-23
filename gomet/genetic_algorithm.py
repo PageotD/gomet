@@ -215,10 +215,10 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     def _tournament_selection(self):
         # Chose two challengers in the pool
-        challenger1 = np.random.random(0, self.popsize)
+        challenger1 = np.random.randint(0, self.popsize)
         challenger2 = challenger1
         while challenger1 == challenger2:
-            challenger2 = np.random.random(0, self.popsize)
+            challenger2 = np.random.randint(0, self.popsize)
         # Tournament
         if self.fitness[challenger1] < self.fitness[challenger2]:
             selected = self.current[challenger1]
@@ -232,12 +232,18 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> CROSSOVER STRATEGIES
     # ------------------------------------------------------------------------
-    def _simple_crossover(self, children1, children2):
+    def _simple_crossover(self, parent1, parent2):
         if np.random.random_sample() < self.pc:
             # Determine the crossover point
-            icross = np.random.randint(0, len(children1))
-            children1[icross:], children2[icross:] = \
-                children2[icross:], children1[icross:]
+            icross = np.random.randint(0, len(parent1))
+     
+            children1 =  parent1[:icross]+parent2[icross:]
+            children2 =  parent2[:icross]+parent1[icross:]
+        else:
+            children1 = parent1
+            children2 = parent2
+        
+        return children1, children2
     
     def _multiple_crossover(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -271,8 +277,7 @@ class GeneticAlgorithm():
                 parent1 = self._tournament_selection()
                 parent2 = self._tournament_selection()
                 # Crossover
-                children1 = None
-                children2 = None
+                children1, children2 = self._simple_crossover(parent1, parent2)
                 # Mutation
                 children1 = None
                 children2 = None

@@ -108,5 +108,34 @@ class TestGeneticAlgorithm:
         ga2._evaluate_pool()
         assert_almost_equal(ga2.fitness, output, decimal=6)
         
+    # ------------------------------------------------------------------------
+    # >> SELECTION STRATEGIES
+    # ------------------------------------------------------------------------
+    def test_tournament_selection(self):
+        # Initialize random number generator
+        np.random.seed(0)
+        output = '01100:01111:10101'
+        bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
+        ga2 = ga(rosen, bounds, popsize=4, maxiter=1)
+        ga2._initialize_pool()
+        ga2._evaluate_pool()
+        parent1 = ga2._tournament_selection()
+        assert(parent1 == output)
+        
+    # ------------------------------------------------------------------------
+    # >> CROSSOVER STRATEGIES
+    # ------------------------------------------------------------------------
+    def test_simple_crossover(self):
+        # Initialize random number generator
+        np.random.seed(8)
+        parent1 = '00000:00000:00000'
+        parent2 = '11111:11111:11111'
+        output1 = '00000:00011:11111'
+        output2 = '11111:11100:00000'
+        bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
+        ga2 = ga(rosen, bounds, popsize=4, maxiter=1, pc=1.0)
+        children1, children2 = ga2._simple_crossover(parent1, parent2)
+        assert([children1, children2] == [output1, output2])
+        
 if __name__ == "__main__" :
     np.testing.run_module_suite()
