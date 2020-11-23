@@ -1,4 +1,4 @@
-from numpy.testing import assert_, assert_raises
+from numpy.testing import assert_, assert_raises, assert_almost_equal
 from scipy.optimize import rosen
 import numpy as np
 
@@ -93,6 +93,20 @@ class TestGeneticAlgorithm:
         ga2 = ga(rosen, bounds, popsize=4)
         ga2._initialize_pool()
         assert(ga2.current == output)
+        
+    # ------------------------------------------------------------------------
+    # >> EVALUATE POOL
+    # ------------------------------------------------------------------------
+    def test_evaluate_pool(self):
+        # Initialize random number generator
+        np.random.seed(0)
+        output = [4137.901143558185, 1499969.7544094827, 
+                  614853.8981593271, 12300.445016409998]
+        bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
+        ga2 = ga(rosen, bounds, popsize=4, maxiter=1)
+        ga2._initialize_pool()
+        ga2._evaluate_pool()
+        assert_almost_equal(ga2.fitness, output, decimal=6)
         
 if __name__ == "__main__" :
     np.testing.run_module_suite()

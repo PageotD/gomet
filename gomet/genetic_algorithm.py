@@ -197,14 +197,17 @@ class GeneticAlgorithm():
             genes = self.current[ipop].split(':')
             # Convert binary chromosomes into real parameter values
             param = []
-            for igene in len(genes):
+            for igene in range(len(genes)):
                 bmin, bmax, bsamp = self.bounds[igene] 
                 value = bmin+int(genes[igene], 2)/(bsamp-1)*(bmax-bmin)
                 param.append(value)
             # Evaluate chromosomes using the external function
-            result = self.func(param, self.fargs)
+            if not self.fargs:
+                result = self.func(param)
+            else:
+                result = self.func(param, self.fargs)
             self.fitness.append(result)
-    
+            
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
