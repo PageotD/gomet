@@ -236,10 +236,11 @@ class GeneticAlgorithm():
         if np.random.random_sample() < self.pc:
             # Determine the crossover point
             icross = np.random.randint(0, len(parent1))
-     
+            # Crossover
             children1 =  parent1[:icross]+parent2[icross:]
             children2 =  parent2[:icross]+parent1[icross:]
         else:
+            # No crossover
             children1 = parent1
             children2 = parent2
         
@@ -251,8 +252,28 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> MUTATION STRATEGIES
     # ------------------------------------------------------------------------
-    def _standard_mutation(self):
-        raise NotImplementedError("This function is not implemented yet.")
+    def _standard_mutation(self, children):
+        # Split chromosome in genes
+        genes = children.split(':')
+        new_genes = []
+        # Loop over genes
+        for igene in range(len(genes)):
+            # Split gene in bits
+            bits = list(genes[igene])
+            # Loop over bits
+            for ibit in range(len(bits)): 
+                # Test for mutation
+                if np.random.random() < self.pm:
+                    if bits[ibit] == '0':
+                        bits[ibit] = '1'
+                    else:
+                        bits[ibit] = '0'
+            # Reassemble gene
+            new_genes.append(''.join(bits))
+        # Reassemble chromosome
+        children = ':'.join(new_genes)
+        
+        return children
     
     def _linear_mutation(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -279,8 +300,8 @@ class GeneticAlgorithm():
                 # Crossover
                 children1, children2 = self._simple_crossover(parent1, parent2)
                 # Mutation
-                children1 = None
-                children2 = None
+                children1 = self._standard_mutation(children1)
+                children2 = self._standard_mutation(children1)
                 # New generation
                 new_generation.append(children1)
                 new_generation.append(children2)

@@ -137,5 +137,18 @@ class TestGeneticAlgorithm:
         children1, children2 = ga2._simple_crossover(parent1, parent2)
         assert([children1, children2] == [output1, output2])
         
+    # ------------------------------------------------------------------------
+    # >> MUTATION STRATEGIES
+    # ------------------------------------------------------------------------
+    def test_standard_mutation(self):
+        # Initialize random number generator
+        np.random.seed(8)
+        input1 = '01010:10001:10000'
+        output = '10101:01110:01111'
+        bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
+        ga2 = ga(rosen, bounds, popsize=4, maxiter=1, pm=1.0)
+        children1 = ga2._standard_mutation(input1)
+        assert(children1 == output)
+        
 if __name__ == "__main__" :
     np.testing.run_module_suite()
