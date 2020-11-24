@@ -12,6 +12,8 @@ Contents:
    :maxdepth: 2
 
 
+* :doc:`api/index`
+
 
 Indices and tables
 ==================
