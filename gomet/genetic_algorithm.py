@@ -5,7 +5,7 @@ Global Optimization Methods In Geophysical Inversion, Sen & Stoffa (2013)
 
 import math
 import numpy as np
-from scipy.optimize import OptimizeResult
+from scipy.optimize import OptimizeResult, Bounds
 from scipy.optimize.optimize import _status_message
 
 from scipy._lib._util import check_random_state
@@ -214,6 +214,11 @@ class GeneticAlgorithm():
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
     def _tournament_selection(self):
+        """
+        Tournament between two chromosomes chosen at random from the current 
+        pool. The winner, the one with the best fitness value, is selected for
+        crossover in order to produce the next generation of chromosome.
+        """
         # Chose two challengers in the pool
         challenger1 = np.random.randint(0, self.popsize)
         challenger2 = challenger1
@@ -233,6 +238,10 @@ class GeneticAlgorithm():
     # >> CROSSOVER STRATEGIES
     # ------------------------------------------------------------------------
     def _simple_crossover(self, parent1, parent2):
+        """
+        Combine the genetic information of two chromosomes (parents) to 
+        generate the offsprings (childrens).
+        """
         if np.random.random_sample() < self.pc:
             # Determine the crossover point
             icross = np.random.randint(0, len(parent1))
@@ -253,6 +262,10 @@ class GeneticAlgorithm():
     # >> MUTATION STRATEGIES
     # ------------------------------------------------------------------------
     def _standard_mutation(self, children):
+        """
+        Flip an arbitrary bit in the chromosome genes. 
+
+        """
         # Split chromosome in genes
         genes = children.split(':')
         new_genes = []
@@ -285,6 +298,8 @@ class GeneticAlgorithm():
     # >> SOLVE
     # ------------------------------------------------------------------------
     def solve(self):
+        # Initiate OptimizeResult
+        result = OptimizeResult()
         # Generate pool
         self._initialize_pool()
         # Evaluate chromosomes using the external function
@@ -309,3 +324,10 @@ class GeneticAlgorithm():
             self.current = new_generation[:]
             # Evaluate chromosome using the external function
             self._evaluate_pool()
+        
+        # Get the best solution
+        ibest = np.argmin(self.misfit)
+        result.x = self.current[ibest]
+        result.success = True
+        
+        return result
