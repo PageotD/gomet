@@ -1,14 +1,58 @@
-"""
-genetic_algorithm: A Genetic Algorithm optimization as described in
-Global Optimization Methods In Geophysical Inversion, Sen & Stoffa (2013)
-"""
-
 import math
 import numpy as np
 from scipy.optimize import OptimizeResult, Bounds
 from scipy.optimize.optimize import _status_message
 
 from scipy._lib._util import check_random_state
+
+def genetic_algorithm(func):
+    """
+    Find the global minimum of a function using Genetic Algorithm.
+    
+    Parameters
+    ----------
+    func : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    Notes
+    -----
+    Genetic Algorithm is a population-based, stochastic optimization method 
+    that mimics some evolution processes and natural selection. At each 
+    iteration, pairs of chromosomes are selected (based on their fitness) to 
+    pass their genes to the next generation. Each pairs of selected 
+    chromosomes will produce offspring for the next generation through 
+    crossover and mutation phases.
+    
+    This implementation is originally based on [1]_ and is improved following 
+    [2]_ and [3]_.
+    
+    Examples
+    --------
+    Let us consider the problem of minimizing the Rosenbrock function. This
+    function is implemented in `rosen` in `scipy.optimize`.
+    
+    >>> from scipy.optimize import rosen, differential_evolution
+    
+    References
+    ----------
+    .. [1] Gallagher, K. & Sambridge, M. Genetic algorithms: a powerful tool 
+           for large-scale nonlinear optimization problems Computers & 
+           Geosciences, Elsevier, 1994, 20, 1229-1236.
+           
+    .. [2] Sambridge, M. & Gallagher, K. Earthquake hypocenter location using 
+           genetic algorithms Bulletin of the Seismological Society of America,
+           Seismological Society of America, 1993, 83, 1467-1491
+    
+    .. [3] Sen, M. K. & Stoffa, P. L. Rapid sampling of model space using 
+           genetic algorithms: examples from seismic waveform inversion 
+           Geophysical Journal International, Oxford University Press, 1992, 
+           108, 281-292
+    """
+    pass
 
 class GeneticAlgorithm():
     """
@@ -246,14 +290,14 @@ class GeneticAlgorithm():
             # Determine the crossover point
             icross = np.random.randint(0, len(parent1))
             # Crossover
-            children1 =  parent1[:icross]+parent2[icross:]
-            children2 =  parent2[:icross]+parent1[icross:]
+            offspring1 =  parent1[:icross]+parent2[icross:]
+            offspring2 =  parent2[:icross]+parent1[icross:]
         else:
             # No crossover
-            children1 = parent1
-            children2 = parent2
+            offspring1 = parent1
+            offspring2 = parent2
         
-        return children1, children2
+        return offspring1, offspring2
     
     def _multiple_crossover(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -261,13 +305,13 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> MUTATION STRATEGIES
     # ------------------------------------------------------------------------
-    def _standard_mutation(self, children):
+    def _standard_mutation(self, offspring):
         """
         Flip an arbitrary bit in the chromosome genes. 
 
         """
         # Split chromosome in genes
-        genes = children.split(':')
+        genes = offspring.split(':')
         new_genes = []
         # Loop over genes
         for igene in range(len(genes)):
@@ -284,9 +328,9 @@ class GeneticAlgorithm():
             # Reassemble gene
             new_genes.append(''.join(bits))
         # Reassemble chromosome
-        children = ':'.join(new_genes)
+        offspring = ':'.join(new_genes)
         
-        return children
+        return offspring
     
     def _linear_mutation(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -313,13 +357,13 @@ class GeneticAlgorithm():
                 parent1 = self._tournament_selection()
                 parent2 = self._tournament_selection()
                 # Crossover
-                children1, children2 = self._simple_crossover(parent1, parent2)
+                offspring1, offspring2 = self._simple_crossover(parent1, parent2)
                 # Mutation
-                children1 = self._standard_mutation(children1)
-                children2 = self._standard_mutation(children1)
+                offspring1 = self._standard_mutation(offspring1)
+                offspring2 = self._standard_mutation(offspring2)
                 # New generation
-                new_generation.append(children1)
-                new_generation.append(children2)
+                new_generation.append(offspring1)
+                new_generation.append(offspring2)
             # New generation becomes the current generation
             self.current = new_generation[:]
             # Evaluate chromosome using the external function
