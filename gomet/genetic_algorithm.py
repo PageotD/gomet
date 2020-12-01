@@ -81,7 +81,6 @@ class GeneticAlgorithm():
     _crossover_modes = ['simple', 'multiple']
     _mutation_modes  = ['standard', 'linear', 'exponential']
 
-    
     # ------------------------------------------------------------------------
     # >> INITIALIZE
     # ------------------------------------------------------------------------
@@ -114,7 +113,7 @@ class GeneticAlgorithm():
             
         # Check selection mode
         if selection.lower() in self._selection_modes:
-            self._selection = selection.lower()
+            self._selection = getattr(self, selection.lower())
         else:
             raise ValueError("Please select a valid selection strategy")
         
@@ -257,7 +256,7 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
-    def _tournament_selection(self):
+    def tournament(self):
         """
         Tournament between two chromosomes chosen at random from the current 
         pool. The winner, the one with the best fitness value, is selected for
@@ -354,8 +353,8 @@ class GeneticAlgorithm():
             new_generation = []
             for i in range(self.pop.size/2):
                 # Selection
-                parent1 = self._tournament_selection()
-                parent2 = self._tournament_selection()
+                parent1 = self.tournament()
+                parent2 = self.tournament()
                 # Crossover
                 offspring1, offspring2 = self._simple_crossover(parent1, parent2)
                 # Mutation
