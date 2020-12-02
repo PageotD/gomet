@@ -78,15 +78,34 @@ class GeneticAlgorithm():
     #    in lists
     # ------------------------------------------------------------------------
     _selection_modes = ['tournament', 'roulette']
-    _crossover_modes = ['simple', 'multiple']
+    _crossover_modes = ['single', 'multiple']
     _mutation_modes  = ['standard', 'linear', 'exponential']
 
+    # Selection strategies
+    _selStrategies = {
+        'tournament': '_selTournament',
+        'roulette': '_selRoulette'
+        }
+    
+    # Crossover strategies
+    _xovStrategies = {
+        'single': '_xovSingle',
+        'multiple': '_xovMultiple'
+        }
+    
+    # Mutation strategies
+    _mutStrategies = {
+        'uniform': '_mutUniform',
+        'linear': '_mutLinear',
+        'exponential': '_mutExponent'
+        }
+    
     # ------------------------------------------------------------------------
     # >> INITIALIZE
     # ------------------------------------------------------------------------
     def __init__(self, func, bounds, fargs=(), popsize=100, maxiter=100, 
-                 selection='tournament', crossover='simple', pc=0.2, 
-                 mutation='standard', pm=0.05):
+                 selection='tournament', crossover='single', pc=0.2, 
+                 mutation='uniform', pm=0.05):
        
         # Initiate class
         self.func = func
@@ -112,23 +131,23 @@ class GeneticAlgorithm():
             raise ValueError("Population must be a multiple of 2 and >= 2")
             
         # Check selection mode
-        if selection.lower() in self._selection_modes:
-            self._selection = getattr(self, selection.lower())
+        if selection in self._selStrategies:
+            self._selection = getattr(self, self._selStrategies[selection])
         else:
             raise ValueError("Please select a valid selection strategy")
         
         # Check crossover mode
-        if crossover.lower() in self._crossover_modes:
-            self._crossover = crossover.lower()
+        if crossover in self._xovStrategies:
+            self._crossover = getattr(self, self._xovStrategies[crossover])
         else:
             raise ValueError("Please select a valid crossover strategy")
             
         # Check crossover mode
-        if mutation.lower() in self._mutation_modes:
-            self._mutation = mutation.lower()
+        if mutation in self._mutStrategies:
+            self._mutation = getattr(self, self._mutStrategies[mutation])
         else:
             raise ValueError("Please select a valid mutation strategy")
-        
+    
     # ------------------------------------------------------------------------
     # >> NEAREST POWER OF 2
     # ------------------------------------------------------------------------
@@ -256,7 +275,7 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
-    def tournament(self):
+    def _selTournament(self):
         """
         Tournament between two chromosomes chosen at random from the current 
         pool. The winner, the one with the best fitness value, is selected for
@@ -274,13 +293,13 @@ class GeneticAlgorithm():
             selected = self.current[challenger2]
         return selected
     
-    def _roulette_selection(self):
+    def _selRoulette(self):
         raise NotImplementedError("This function is not implemented yet.")
     
     # ------------------------------------------------------------------------
     # >> CROSSOVER STRATEGIES
     # ------------------------------------------------------------------------
-    def _simple_crossover(self, parent1, parent2):
+    def _xovSingle(self, parent1, parent2):
         """
         Combine the genetic information of two chromosomes (parents) to 
         generate the offsprings (childrens).
@@ -298,13 +317,13 @@ class GeneticAlgorithm():
         
         return offspring1, offspring2
     
-    def _multiple_crossover(self):
+    def _xovMultiple(self):
         raise NotImplementedError("This function is not implemented yet.")
     
     # ------------------------------------------------------------------------
     # >> MUTATION STRATEGIES
     # ------------------------------------------------------------------------
-    def _standard_mutation(self, offspring):
+    def _mutUniform(self, offspring):
         """
         Flip an arbitrary bit in the chromosome genes. 
 
@@ -331,10 +350,10 @@ class GeneticAlgorithm():
         
         return offspring
     
-    def _linear_mutation(self):
+    def _mutLinear(self):
         raise NotImplementedError("This function is not implemented yet.")
     
-    def _exponential_mutation(self):
+    def _mutExponent(self):
         raise NotImplementedError("This function is not implemented yet.")
     
     # ------------------------------------------------------------------------
@@ -356,10 +375,10 @@ class GeneticAlgorithm():
                 parent1 = self.tournament()
                 parent2 = self.tournament()
                 # Crossover
-                offspring1, offspring2 = self._simple_crossover(parent1, parent2)
+                offspring1, offspring2 = self._crossover(parent1, parent2)
                 # Mutation
-                offspring1 = self._standard_mutation(offspring1)
-                offspring2 = self._standard_mutation(offspring2)
+                offspring1 = self._mutation(offspring1)
+                offspring2 = self._mutation(offspring2)
                 # New generation
                 new_generation.append(offspring1)
                 new_generation.append(offspring2)

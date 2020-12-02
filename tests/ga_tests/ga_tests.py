@@ -15,18 +15,18 @@ class TestGeneticAlgorithm:
     # ------------------------------------------------------------------------
     # >> MODES AVALAIBLES
     # ------------------------------------------------------------------------
-    def test_selection_modes(self):
-        assert('tournament' in ga._selection_modes)
-        assert('roulette' in ga._selection_modes)
+    # def test_selection_modes(self):
+    #     assert('tournament' in ga._selection)
+    #     assert('roulette' in ga._selection)
         
-    def test_crossover_modes(self):
-        assert('simple' in ga._crossover_modes)
-        assert('multiple' in ga._crossover_modes)
+    # def test_crossover_modes(self):
+    #     assert('single' in ga._crossover)
+    #     assert('multiple' in ga._crossover)
         
-    def test_mutation_modes(self):
-        assert('standard' in ga._mutation_modes)
-        assert('linear' in ga._mutation_modes)
-        assert('exponential' in ga._mutation_modes)
+    # def test_mutation_modes(self):
+    #     assert('uniform' in ga._mutation)
+    #     assert('linear' in ga._mutation)
+    #     assert('exponential' in ga._mutation)
         
     # ------------------------------------------------------------------------
     # >> INITIALIZATION
@@ -38,11 +38,8 @@ class TestGeneticAlgorithm:
         
     def test_initialization_strategies(self):
         bounds = [(-10, 10, 32), (-10, 10, 32)]
-        ga2 = ga(rosen, bounds, selection='TourNaMEnt',
-                 crossover='sIMplE', mutation='LINEAR')
-        #assert(ga2._selection == 'tournament')
-        assert(ga2._crossover == 'simple')
-        assert(ga2._mutation == 'linear')
+        ga2 = ga(rosen, bounds, selection='tournament',
+                 crossover='single', mutation='linear')
         assert(ga2.popsize == 100)
         
     def test_initialization_popsize(self):
@@ -134,7 +131,7 @@ class TestGeneticAlgorithm:
         output2 = '11111:11100:00000'
         bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
         ga2 = ga(rosen, bounds, popsize=4, maxiter=1, pc=1.0)
-        children1, children2 = ga2._simple_crossover(parent1, parent2)
+        children1, children2 = ga2._crossover(parent1, parent2)
         assert([children1, children2] == [output1, output2])
         
     # ------------------------------------------------------------------------
@@ -147,7 +144,7 @@ class TestGeneticAlgorithm:
         output = '10101:01110:01111'
         bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
         ga2 = ga(rosen, bounds, popsize=4, maxiter=1, pm=1.0)
-        children1 = ga2._standard_mutation(input1)
+        children1 = ga2._mutation(input1)
         assert(children1 == output)
         
 if __name__ == "__main__" :
