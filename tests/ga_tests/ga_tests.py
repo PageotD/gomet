@@ -4,6 +4,8 @@ import numpy as np
 
 import sys
 import os
+import operator
+#from candidate import Candidate
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 
                                                 '../../gomet')))
@@ -90,6 +92,8 @@ class TestGeneticAlgorithm:
         ga2 = ga(rosen, bounds, popsize=4)
         ga2._initialize_pool()
         assert(ga2.current == output)
+        chromosomes = [obj.chromosome for obj in ga2.pool]
+        assert(chromosomes == output)
         
     # ------------------------------------------------------------------------
     # >> EVALUATE POOL
@@ -103,7 +107,8 @@ class TestGeneticAlgorithm:
         ga2 = ga(rosen, bounds, popsize=4, maxiter=1)
         ga2._initialize_pool()
         ga2._evaluate_pool()
-        assert_almost_equal(ga2.fitness, output, decimal=6)
+        fitness = [obj.fitness for obj in ga2.pool]
+        assert_almost_equal(fitness, output, decimal=6)
         
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
@@ -111,13 +116,18 @@ class TestGeneticAlgorithm:
     def test_tournament_selection(self):
         # Initialize random number generator
         np.random.seed(0)
-        output = '01100:01111:10101'
+        output = ['00100:10111:00110', '00011:00111:01001', 
+                  '00000:00011:11011', '00000:00011:11011', 
+                  '00011:00111:01001', '00011:00111:01001', 
+                  '00000:00011:11011', '00000:00011:11011', 
+                  '11010:00001:00110', '00011:00111:01001']
         bounds = [(-10, 10, 32), (-10, 10, 32), (-10, 10, 32)]
-        ga2 = ga(rosen, bounds, popsize=4, maxiter=1)
+        ga2 = ga(rosen, bounds, popsize=10, maxiter=1)
         ga2._initialize_pool()
         ga2._evaluate_pool()
-        parent1 = ga2._selection()
-        assert(parent1 == output)
+        parents = ga2._selection()
+        newpop = [obj.chromosome for obj in parents]
+        assert(newpop == output)
         
     # ------------------------------------------------------------------------
     # >> CROSSOVER STRATEGIES

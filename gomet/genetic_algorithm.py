@@ -1,7 +1,9 @@
 import math
 import numpy as np
+from candidate import Candidate
 from scipy.optimize import OptimizeResult, Bounds
 from scipy.optimize.optimize import _status_message
+from operator import attrgetter
 
 from scipy._lib._util import check_random_state
 
@@ -228,6 +230,9 @@ class GeneticAlgorithm():
         self.current = []
         self.misfit = []
         
+        # Initialize pool
+        self.pool = []
+        
         # Loop over chromosomes in population
         for ichromo in range(self.popsize):
             # Initialise gene_list
@@ -249,16 +254,18 @@ class GeneticAlgorithm():
                 
             # Add chromosome to the current pool
             self.current.append(':'.join(chromosome))
-       
+            self.pool.append(
+                Candidate(chromosome=':'.join(chromosome), fitness=None)
+                )
+            
     # ------------------------------------------------------------------------
     # >> EVALUATE POOL
     # ------------------------------------------------------------------------
     def _evaluate_pool(self):
         # Loop over chromosomes
-        self.fitness = []
         for ipop in range(self.popsize):
             # Split chromosome in genes
-            genes = self.current[ipop].split(':')
+            genes = self.pool[ipop].chromosome.split(':')
             # Convert binary chromosomes into real parameter values
             param = []
             for igene in range(len(genes)):
@@ -270,28 +277,29 @@ class GeneticAlgorithm():
                 result = self.func(param)
             else:
                 result = self.func(param, self.fargs)
-            self.fitness.append(result)
+            self.pool[ipop].fitness = result
             
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
-    def _selTournament(self):
+    def _selTournament(self, k=5):
         """
         Tournament between two chromosomes chosen at random from the current 
         pool. The winner, the one with the best fitness value, is selected for
         crossover in order to produce the next generation of chromosome.
         """
-        # Chose two challengers in the pool
-        challenger1 = np.random.randint(0, self.popsize)
-        challenger2 = challenger1
-        while challenger1 == challenger2:
-            challenger2 = np.random.randint(0, self.popsize)
-        # Tournament
-        if self.fitness[challenger1] < self.fitness[challenger2]:
-            selected = self.current[challenger1]
-        else:
-            selected = self.current[challenger2]
-        return selected
+        
+        # Generate the new parent population
+        parentpop = []
+        for ipop in range(self.popsize):
+            # Choose k challengers in the pool
+            challengers = np.random.choice(self.pool, size=k)
+            # Select winner
+            winner = max(challengers, key=attrgetter('fitness'))
+            # Add the winner to the new population
+            parentpop.append(winner)
+        
+        return parentpop
     
     def _selRoulette(self):
         raise NotImplementedError("This function is not implemented yet.")
@@ -369,7 +377,7 @@ class GeneticAlgorithm():
         # Loop over iteration
         for iteration in range(self.maxiter):
             # New generation
-            new_generation = []
+            new_generation = self._selection()
             for i in range(self.pop.size/2):
                 # Selection
                 parent1 = self.tournament()
