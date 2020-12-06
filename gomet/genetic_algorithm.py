@@ -1,6 +1,6 @@
 import math
 import numpy as np
-from candidate import Candidate
+from common import Candidate
 from scipy.optimize import OptimizeResult, Bounds
 from scipy.optimize.optimize import _status_message
 from operator import attrgetter
