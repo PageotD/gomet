@@ -151,61 +151,243 @@ class GeneticAlgorithm():
             raise ValueError("Please select a valid mutation strategy")
     
     # ------------------------------------------------------------------------
-    # >> NEAREST POWER OF 2
+    # >> CODING
     # ------------------------------------------------------------------------
-    def _nearest_power2(self, n):
+    def nearPower2(self, n):
         """
         Get the nearest power of 2 of an integer value.
 
         Parameters
         ----------
         n : int
-            Integer value.
+            An integer.
 
         Returns
         -------
         int
-            Nearest power of 2.
+            nearest power of 2 of n.
 
         """
-        
         # Get the log of n in base 2 and get the closest integer to n
         npower = round(math.log(n, 2))
         
         # Return the next power of 2
         return int(math.pow(2, npower))
     
-    # ------------------------------------------------------------------------
-    # >> INTEGER TO BINARY CONVERSION
-    # ------------------------------------------------------------------------
-    def _integer2binary(self, rgene, nsamples):
+    def codInt2bin(self, intval, nsample=32):
         """
-        Return the gene (integer) in binary format with the appropriate lenght
+        Convert an `int` in its binary string representation.
+
+        Parameters
+        ----------
+        intval : int
+            Integer to convert
+        nsample : int, optional
+            Number of samples in the interval min/max bounds. 
+            The default is 32.
+
+        Returns
+        -------
+        binstr : int
+            Binary string representation of the input integer.
 
         """
-
+        
+        # Calculate the number of bits needed for the binary representation
+        # given the number of samples between the min. and max. bounds.
+        # The number of samples must be a power of 2. If not, the nearest power 
+        # of 2 is used.
+        nsample_check = self.nearPower2(nsample)
+        
         # Calculate the maximum lenght of the bit-string
         # Old version : nelements = 1./np.log(2.)*np.log(float(nsamples))
-        nelements = len(np.binary_repr(nsamples-1))
-        
+        nbits = len(np.binary_repr(nsample_check-1))
+    
         # Convert the gene in binary format
-        bgene = np.binary_repr(rgene, width=nelements)
+        binstr = np.binary_repr(intval, width=nbits)
 
-        return bgene
+        return binstr
+    
+    def codBin2int(self, binstr):
+        """
+        Convert binary string representation in its integer value.
+
+        Parameters
+        ----------
+        binstr : str
+            Binary string representation of an integer.
+
+        Returns
+        -------
+        intval : int
+            Corresponding integer value.
+
+        """
+        # Convert the gene in integer
+        intval = np.int(binstr, 2)
+        
+        return intval
+    
+    def codBin2gray(self, binstr):
+        """
+        Convert a binary string representation in gray code.
+
+        Parameters
+        ----------
+        binstr : int
+            Binary string representation.
+
+        Returns
+        -------
+        grayCode : int
+            Gray code representation of the input binary string.
+
+        """
+        grayCode = binstr[0]
+        
+        for ibit in range(1, len(binstr)):
+            if binstr[ibit-1] == binstr[ibit]:
+                grayCode = grayCode+'0'
+            else:
+                grayCode = grayCode+'1'
+
+        return grayCode
+    
+    def codGray2bin(self, grayCode):
+        """
+        Convert a gray code in binary string.
+
+        Parameters
+        ----------
+        grayCode : int
+            Gray code representation.
+
+        Returns
+        -------
+        binstr : int
+            Binary string representation of the input gray code.
+
+        """
+        binstr = grayCode[0]
+        
+        for ibit in range(1, len(grayCode)):
+            if grayCode[ibit] == '0':
+                binstr = binstr+binstr[ibit-1]
+            else:
+                if binstr[ibit-1] == '0':
+                    binstr = binstr+'1'
+                else:
+                    binstr = binstr+'0'
+
+        return binstr
+    
+    def codInt2gray(self, intval, nsample=32):
+        """
+        Convert an `int` in its gray code representation.
+
+        Parameters
+        ----------
+        intval : int
+            Integer to convert
+        nsample : int, optional
+            Number of samples in the interval min/max bounds. 
+            The default is 32.
+
+        Returns
+        -------
+        binstr : int
+            Gray code representation of the input integer.
+
+        """
+        
+        binstr = self.codInt2bin(intval, nsample=nsample)
+        return self.codBin2gray(binstr)
+    
+    def codGray2int(self, grayCode):
+        """
+        Convert binary string representation in its integer value.
+
+        Parameters
+        ----------
+        grayCode : str
+            Gray code binary string representation of an integer.
+
+        Returns
+        -------
+        intval : int
+            Corresponding integer value.
+
+        """
+        binstr = self.codGray2bin(grayCode)
+        return self.codBin2int(binstr)
     
     # ------------------------------------------------------------------------
-    # >> BINARY TO INTEGER CONVERSION
+    # >> POPULATION
     # ------------------------------------------------------------------------
-    def _binary2integer(self, bingene):
+    def chrInitialize(self):
+        pass
+    
+    def chrDecode(self):
+        pass
+    
+    def popInitialize(self):
         """
-        Return the integer value of a binary string
+        Initialize the population of chromosomes by selecting candidate 
+        solutions at random.
+
+        Returns
+        -------
+        None.
 
         """
+    
+        # Get the number of genes (parameters) from bounds
+        if isinstance(self.bounds, list):
+            self.ngenes = len(self.bounds)
+        else:
+            self.ngenes = 1
         
-        # Convert the gene in integer
-        intgene = np.int(bingene, 2)
-
-        return intgene
+        # Initialize population list
+        self.population = []
+    
+        # Loop over chromosomes in population
+        for ichromo in range(self.popsize):
+            # Initialise individual
+            individual = Candidate(chromosome=[], fitness=None)
+            # Loop over number of genes
+            for igene in range(self.ngenes):
+                # Get the corresponding bounds and number of samples
+                if isinstance(self.bounds, list):
+                    (bmin, bmax, nsamples) = self.bounds[igene]
+                else:
+                    (bmin, bmax, nsamples) = self.bounds
+                # Draw an integer at random in [0, nsamples]
+                rgene = np.random.randint(0, high=nsamples)
+                # Convert in binary format with the appropriate lenght
+                bgene = self._integer2binary(rgene, nsamples)
+                individual.chromosome.append(bgene)
+                
+            # Add chromosome to the current pool
+            self.population.append(individual)
+            
+    def popEvaluate(self):
+        pass
+    
+    # ------------------------------------------------------------------------
+    # >> SELECTION STRATEGIES
+    # ------------------------------------------------------------------------
+    
+    # ------------------------------------------------------------------------
+    # >> CROSSOVER STRATEGIES
+    # ------------------------------------------------------------------------
+    
+    # ------------------------------------------------------------------------
+    # >> MUTATION STRATEGIES
+    # ------------------------------------------------------------------------
+    
+    # ------------------------------------------------------------------------
+    # >> SOLVER
+    # ------------------------------------------------------------------------
     
     # ------------------------------------------------------------------------
     # >> INITIALIZE CHROMOSOME POOL
@@ -225,18 +407,14 @@ class GeneticAlgorithm():
             self.ngenes = len(self.bounds)
         else:
             self.ngenes = 1
-
-        # Initialize population and misfit
-        self.current = []
-        self.misfit = []
         
         # Initialize pool
         self.pool = []
         
         # Loop over chromosomes in population
-        for ichromo in range(self.popsize):
-            # Initialise gene_list
-            chromosome = []
+        for indv in range(self.popsize):
+            # Initialise individual
+            individual = Candidate(chromosome=[], fitness=None)
             # Loop over number of genes
             for igene in range(self.ngenes):
                 # Get the corresponding bounds and number of samples
@@ -250,23 +428,20 @@ class GeneticAlgorithm():
                 rgene = np.random.randint(0, high=nsamples)
                 # Convert in binary format with the appropriate lenght
                 bgene = self._integer2binary(rgene, nsamples)
-                chromosome.append(bgene)
+                individual.chromosome.append(bgene)
                 
             # Add chromosome to the current pool
-            self.current.append(':'.join(chromosome))
-            self.pool.append(
-                Candidate(chromosome=':'.join(chromosome), fitness=None)
-                )
+            self.pool.append(individual)
             
     # ------------------------------------------------------------------------
     # >> EVALUATE POOL
     # ------------------------------------------------------------------------
     def _evaluate_pool(self):
         # Loop over chromosomes
-        for ipop in range(self.popsize):
-            # Split chromosome in genes
-            genes = self.pool[ipop].chromosome.split(':')
-            # Convert binary chromosomes into real parameter values
+        for indv in range(self.popsize):
+            # Get genes
+            genes = self.pool[indv].chromosome
+            # Convert binary genes into real parameter values
             param = []
             for igene in range(len(genes)):
                 bmin, bmax, bsamp = self.bounds[igene] 
@@ -274,24 +449,29 @@ class GeneticAlgorithm():
                 param.append(value)
             # Evaluate chromosomes using the external function
             if not self.fargs:
-                result = self.func(param)
+                self.pool[indv].fitness = self.func(param)
             else:
-                result = self.func(param, self.fargs)
-            self.pool[ipop].fitness = result
+                self.pool[indv].fitness = self.func(param, self.fargs)
             
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
+    def _selProportionate(self):
+        pass
+    
+    def _selRank(self):
+        pass
+    
     def _selTournament(self, k=5):
         """
-        Tournament between two chromosomes chosen at random from the current 
+        Tournament between k chromosomes chosen at random from the current 
         pool. The winner, the one with the best fitness value, is selected for
         crossover in order to produce the next generation of chromosome.
         """
         
         # Generate the new parent population
         parentpop = []
-        for ipop in range(self.popsize):
+        for indv in range(self.popsize):
             # Choose k challengers in the pool
             challengers = np.random.choice(self.pool, size=k)
             # Select winner
