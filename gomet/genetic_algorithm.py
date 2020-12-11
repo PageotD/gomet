@@ -325,7 +325,32 @@ class GeneticAlgorithm():
     # >> POPULATION
     # ------------------------------------------------------------------------
     def chrInitialize(self):
-        pass
+        """
+        Create a chromosome (candidate solution).
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        # Initialise candidate solution
+        solCandidate = Candidate(chromosome=[], fitness=None)
+        
+        # Loop over number of genes
+        for igene in range(self.ngenes):
+            # Get the corresponding bounds and number of samples
+            if isinstance(self.bounds, list):
+                (bmin, bmax, nsamples) = self.bounds[igene]
+            else:
+                (bmin, bmax, nsamples) = self.bounds
+            # Draw an integer at random in [0, nsamples]
+            rgene = np.random.randint(0, high=nsamples)
+            # Convert in binary format with the appropriate lenght
+            bgene = self._integer2binary(rgene, nsamples)
+            solCandidate.chromosome.append(bgene)
+                
+        return solCandidate
     
     def chrDecode(self):
         pass
@@ -352,23 +377,8 @@ class GeneticAlgorithm():
     
         # Loop over chromosomes in population
         for ichromo in range(self.popsize):
-            # Initialise individual
-            individual = Candidate(chromosome=[], fitness=None)
-            # Loop over number of genes
-            for igene in range(self.ngenes):
-                # Get the corresponding bounds and number of samples
-                if isinstance(self.bounds, list):
-                    (bmin, bmax, nsamples) = self.bounds[igene]
-                else:
-                    (bmin, bmax, nsamples) = self.bounds
-                # Draw an integer at random in [0, nsamples]
-                rgene = np.random.randint(0, high=nsamples)
-                # Convert in binary format with the appropriate lenght
-                bgene = self._integer2binary(rgene, nsamples)
-                individual.chromosome.append(bgene)
-                
             # Add chromosome to the current pool
-            self.population.append(individual)
+            self.population.append(self.chrInitialize())
             
     def popEvaluate(self):
         pass
