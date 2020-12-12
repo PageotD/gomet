@@ -341,9 +341,11 @@ class GeneticAlgorithm():
         for igene in range(self.ngenes):
             # Get the corresponding bounds and number of samples
             if isinstance(self.bounds, list):
-                (bmin, bmax, nsamples) = self.bounds[igene]
+                (bmin, bmax) = self.bounds[igene]
+                nsample = self.samples[igene]
             else:
-                (bmin, bmax, nsamples) = self.bounds
+                (bmin, bmax) = self.bounds
+                nsample = self.samples
             # Draw an integer at random in [0, nsamples]
             rgene = np.random.randint(0, high=nsamples)
             # Convert in binary format with the appropriate lenght
