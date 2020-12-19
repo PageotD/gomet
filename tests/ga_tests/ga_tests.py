@@ -153,6 +153,100 @@ class TestGeneticAlgorithm:
         test = ga(rosen, bounds, popsize=100, coding='gray')
         solCandidate = test.chrInitialize()
         assert(solCandidate.chromosome == ['01010', '01000'])
+       
+    def test_popInitialize_binary(self):
+        output = [['01100', '01111'], ['10101', '00000'],
+                  ['00011', '11011'], ['00011', '00111'],
+                  ['01001', '10011'], ['10101', '10010'],
+                  ['00100', '10111'], ['00110', '11000'],
+                  ['11000', '01100'], ['11010', '00001']]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10)
+        test.popInitialize()
+        chromosomes = [obj.chromosome for obj in test.population]
+        assert(chromosomes == output)
+        
+    def test_popInitialize_gray(self):
+        output = [['01010', '01000'], ['11111', '00000'],
+                  ['00010', '10110'], ['00010', '00100'],
+                  ['01101', '11010'], ['11111', '11011'],
+                  ['00110', '11100'], ['00101', '10100'],
+                  ['10100', '01010'], ['10111', '00001']]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10, coding='gray')
+        test.popInitialize()
+        chromosomes = [obj.chromosome for obj in test.population]
+        assert(chromosomes == output)
+        
+    def test_chrDecode_binary(self):
+        output = [[-2.258064516129032, -0.32258064516129004],
+                  [3.548387096774192, -10.0],
+                  [-8.064516129032258, 7.419354838709676],
+                  [-8.064516129032258, -5.483870967741936],
+                  [-4.193548387096774, 2.258064516129032],
+                  [3.548387096774192, 1.612903225806452],
+                  [-7.419354838709678, 4.838709677419356],
+                  [-6.129032258064516, 5.483870967741936],
+                  [5.483870967741936, -2.258064516129032],
+                  [6.774193548387096, -9.35483870967742]]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10)
+        test.popInitialize()
+        paramValues = []
+        for ipop in range(len(test.population)):
+            paramValues.append(test.chrDecode(test.population[ipop]))
+        assert_almost_equal(paramValues, output)
+        
+    def test_chrDecode_gray(self):
+        output = [[-2.258064516129032, -0.32258064516129004],
+                  [3.548387096774192, -10.0],
+                  [-8.064516129032258, 7.419354838709676],
+                  [-8.064516129032258, -5.483870967741936],
+                  [-4.193548387096774, 2.258064516129032],
+                  [3.548387096774192, 1.612903225806452],
+                  [-7.419354838709678, 4.838709677419356],
+                  [-6.129032258064516, 5.483870967741936],
+                  [5.483870967741936, -2.258064516129032],
+                  [6.774193548387096, -9.35483870967742]]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10, coding='gray')
+        test.popInitialize()
+        paramValues = []
+        for ipop in range(len(test.population)):
+            paramValues.append(test.chrDecode(test.population[ipop]))
+        assert_almost_equal(paramValues, output)
+        
+    def test_popEvaluate_binary(self):
+        output = [2949.81181911402, 51042.05275353777, 
+                  332054.78978929546, 497393.31484719884, 
+                  23521.06782736938, 12058.46710686598,
+                  252156.38223819496, 102970.94078098927, 
+                  104548.84889569382, 305229.22749022476]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10)
+        test.popInitialize()
+        test.popEvaluate()
+        fitness = [obj.fitness for obj in test.population]
+        assert_almost_equal(fitness, output)
+        
+    def test_popEvaluate_gray(self):
+        output = [2949.81181911402, 51042.05275353777, 
+                  332054.78978929546, 497393.31484719884, 
+                  23521.06782736938, 12058.46710686598,
+                  252156.38223819496, 102970.94078098927, 
+                  104548.84889569382, 305229.22749022476]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10, coding='gray')
+        test.popInitialize()
+        test.popEvaluate()
+        fitness = [obj.fitness for obj in test.population]
+        assert_almost_equal(fitness, output)
         
 # class TestGeneticAlgorithm:
     

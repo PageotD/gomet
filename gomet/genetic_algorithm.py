@@ -366,9 +366,47 @@ class GeneticAlgorithm():
             
         return solCandidate
     
-    def chrDecode(self):
-        pass
-    
+    def chrDecode(self, solCandidate):
+        """
+        
+
+        Parameters
+        ----------
+        solCandidate : Candidate object
+            Input candidate solution containing the chromosome (attribute) to
+            decode.
+
+        Returns
+        -------
+        List of parameter values (one parameter value per gene).
+
+        """
+        
+        # Initialize parameter list
+        paramList = []
+
+        # Get the number of genes (parameters) from bounds
+        if isinstance(self.bounds, list):
+            ngenes = len(self.bounds)
+        else:
+            ngenes = 1
+            
+        # Loop over number of genes
+        for igene in range(ngenes):
+            # Get the corresponding bounds and number of samples
+            if isinstance(self.bounds, list):
+                (bmin, bmax, nsample) = self.bounds[igene]
+            else:
+                (bmin, bmax, nsample) = self.bounds
+            # Decode gene
+            bgene = solCandidate.chromosome[igene]
+            # Convert in integer
+            rgene = self.decoding(bgene)
+            # Convert in parameter value
+            paramList.append(bmin+float(rgene/(nsample-1))*(bmax-bmin))
+
+        return paramList
+        
     def popInitialize(self):
         """
         Initialize the population of chromosomes by selecting candidate 
@@ -389,8 +427,25 @@ class GeneticAlgorithm():
             self.population.append(self.chrInitialize())
             
     def popEvaluate(self):
-        pass
-    
+        """
+        Evaluate the current population.
+
+        Returns
+        -------
+        None.
+
+        """
+        # Loop over population
+        for ipop in range(len(self.population)):
+            # Convert chromosome in real parameter value list
+            paramValues = self.chrDecode(self.population[ipop])
+            # Evaluate chromosomes using the external function
+            if not self.fargs:
+                self.population[ipop].fitness = self.func(paramValues)
+            else:
+                self.population[ipop].fitness = self.func(paramValues, self.fargs)
+            print(self.population[ipop].fitness)
+            
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
@@ -406,50 +461,6 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     # >> SOLVER
     # ------------------------------------------------------------------------
-    
-    # ------------------------------------------------------------------------
-    # >> INITIALIZE CHROMOSOME POOL
-    # ------------------------------------------------------------------------
-    def _initialize_pool(self):
-        """
-        Initialize the chromosome pool.
-
-        Returns
-        -------
-        None.
-
-        """
-        
-        # Get the number of genes from bounds
-        if isinstance(self.bounds, list):
-            self.ngenes = len(self.bounds)
-        else:
-            self.ngenes = 1
-        
-        # Initialize pool
-        self.pool = []
-        
-        # Loop over chromosomes in population
-        for indv in range(self.popsize):
-            # Initialise individual
-            individual = Candidate(chromosome=[], fitness=None)
-            # Loop over number of genes
-            for igene in range(self.ngenes):
-                # Get the corresponding bounds and number of samples
-                if isinstance(self.bounds, list):
-                    (bmin, bmax, nsamples) = self.bounds[igene]
-                else:
-                    (bmin, bmax, nsamples) = self.bounds
-                # Check if the number of samples is a power of 2
-                self._nearest_power2(nsamples)
-                # Draw an integer at random in [0, nsamples]
-                rgene = np.random.randint(0, high=nsamples)
-                # Convert in binary format with the appropriate lenght
-                bgene = self._integer2binary(rgene, nsamples)
-                individual.chromosome.append(bgene)
-                
-            # Add chromosome to the current pool
-            self.pool.append(individual)
             
     # ------------------------------------------------------------------------
     # >> EVALUATE POOL
