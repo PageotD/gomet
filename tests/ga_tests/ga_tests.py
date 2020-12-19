@@ -140,7 +140,20 @@ class TestGeneticAlgorithm:
     # ------------------------------------------------------------------------
     # >> POPULATION
     # ------------------------------------------------------------------------
-    
+    def test_chrInitialize_binary(self):
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=100)
+        solCandidate = test.chrInitialize()
+        assert(solCandidate.chromosome == ['01100', '01111'])
+        
+    def test_chrInitialize_gray(self):
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=100, coding='gray')
+        solCandidate = test.chrInitialize()
+        assert(solCandidate.chromosome == ['01010', '01000'])
+        
 # class TestGeneticAlgorithm:
     
 #     # ------------------------------------------------------------------------

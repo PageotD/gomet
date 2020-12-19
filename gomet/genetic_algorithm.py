@@ -107,7 +107,7 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     def __init__(self, func, bounds, fargs=(), popsize=100, maxiter=100, 
                  selection='tournament', crossover='single', pc=0.2, 
-                 mutation='uniform', pm=0.05):
+                 mutation='uniform', pm=0.05, coding='binary'):
        
         # Initiate class
         self.func = func
@@ -150,6 +150,14 @@ class GeneticAlgorithm():
         else:
             raise ValueError("Please select a valid mutation strategy")
     
+        # Check coding
+        if coding == 'binary':
+            self.encoding = self.codInt2bin
+            self.decoding = self.codBin2int
+        elif coding == 'gray':
+            self.encoding = self.codInt2gray
+            self.decoding = self.codGray2int
+            
     # ------------------------------------------------------------------------
     # >> CODING
     # ------------------------------------------------------------------------
@@ -330,28 +338,32 @@ class GeneticAlgorithm():
 
         Returns
         -------
-        None.
+        Candidate solution object.
 
         """
         
         # Initialise candidate solution
         solCandidate = Candidate(chromosome=[], fitness=None)
         
+        # Get the number of genes (parameters) from bounds
+        if isinstance(self.bounds, list):
+            ngenes = len(self.bounds)
+        else:
+            ngenes = 1
+            
         # Loop over number of genes
-        for igene in range(self.ngenes):
+        for igene in range(ngenes):
             # Get the corresponding bounds and number of samples
             if isinstance(self.bounds, list):
-                (bmin, bmax) = self.bounds[igene]
-                nsample = self.samples[igene]
+                (bmin, bmax, nsample) = self.bounds[igene]
             else:
-                (bmin, bmax) = self.bounds
-                nsample = self.samples
+                (bmin, bmax, nsample) = self.bounds
             # Draw an integer at random in [0, nsamples]
-            rgene = np.random.randint(0, high=nsamples)
+            rgene = np.random.randint(0, high=nsample)
             # Convert in binary format with the appropriate lenght
-            bgene = self._integer2binary(rgene, nsamples)
+            bgene = self.encoding(rgene, nsample=nsample)
             solCandidate.chromosome.append(bgene)
-                
+            
         return solCandidate
     
     def chrDecode(self):
@@ -367,12 +379,6 @@ class GeneticAlgorithm():
         None.
 
         """
-    
-        # Get the number of genes (parameters) from bounds
-        if isinstance(self.bounds, list):
-            self.ngenes = len(self.bounds)
-        else:
-            self.ngenes = 1
         
         # Initialize population list
         self.population = []
