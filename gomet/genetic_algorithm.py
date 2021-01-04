@@ -444,11 +444,37 @@ class GeneticAlgorithm():
                 self.population[ipop].fitness = self.func(paramValues)
             else:
                 self.population[ipop].fitness = self.func(paramValues, self.fargs)
-            print(self.population[ipop].fitness)
             
     # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
+    def selProportionate(self):
+        # Get the fitness of each chromosome
+        fitness = [obj.fitness for obj in self.population]
+        
+        # Sum the fitness values
+        fitnessSum = sum(fitness)
+        
+        # Calculate probabilities for each chromosome
+        prob = []
+        prob.append(fitness[0]/fitnessSum)
+        for ifit in range(1,len(fitness)):
+            prob.append(prob[ifit-1]+fitness[ifit]/fitnessSum)
+        
+        # Initialize newpopulation
+        newpopulation = []
+        
+        # Trial
+        for ipop in range(len(self.population)):
+            trial = np.random.random_sample()
+            idx = 0
+            while trial > prob[idx]:
+                idx += 1
+            newpopulation.append(Candidate(chromosome=self.population[idx].chromosome, fitness=None))
+
+        chromosome = [obj.chromosome for obj in self.population]
+        print(chromosome)
+        return newpopulation
     
     # ------------------------------------------------------------------------
     # >> CROSSOVER STRATEGIES
@@ -459,37 +485,8 @@ class GeneticAlgorithm():
     # ------------------------------------------------------------------------
     
     # ------------------------------------------------------------------------
-    # >> SOLVER
-    # ------------------------------------------------------------------------
-            
-    # ------------------------------------------------------------------------
-    # >> EVALUATE POOL
-    # ------------------------------------------------------------------------
-    def _evaluate_pool(self):
-        # Loop over chromosomes
-        for indv in range(self.popsize):
-            # Get genes
-            genes = self.pool[indv].chromosome
-            # Convert binary genes into real parameter values
-            param = []
-            for igene in range(len(genes)):
-                bmin, bmax, bsamp = self.bounds[igene] 
-                value = bmin+int(genes[igene], 2)/(bsamp-1)*(bmax-bmin)
-                param.append(value)
-            # Evaluate chromosomes using the external function
-            if not self.fargs:
-                self.pool[indv].fitness = self.func(param)
-            else:
-                self.pool[indv].fitness = self.func(param, self.fargs)
-            
-    # ------------------------------------------------------------------------
     # >> SELECTION STRATEGIES
     # ------------------------------------------------------------------------
-    def _selProportionate(self):
-        pass
-    
-    def _selRank(self):
-        pass
     
     def _selTournament(self, k=5):
         """

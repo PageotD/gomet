@@ -140,6 +140,7 @@ class TestGeneticAlgorithm:
     # ------------------------------------------------------------------------
     # >> POPULATION
     # ------------------------------------------------------------------------
+  
     def test_chrInitialize_binary(self):
         np.random.seed(0)
         bounds = [(-10, 10, 32), (-10, 10, 32)]
@@ -248,6 +249,25 @@ class TestGeneticAlgorithm:
         fitness = [obj.fitness for obj in test.population]
         assert_almost_equal(fitness, output)
         
+    # ------------------------------------------------------------------------
+    # >> SELECTION STRATEGIES
+    # ------------------------------------------------------------------------
+    
+    def test_selProportionate_binary(self):
+        output = [['01010', '01000'], ['11111', '00000'], 
+                  ['00010', '10110'], ['00010', '00100'], 
+                  ['01101', '11010'], ['11111', '11011'], 
+                  ['00110', '11100'], ['00101', '10100'], 
+                  ['10100', '01010'], ['10111', '00001']]
+        np.random.seed(0)
+        bounds = [(-10, 10, 32), (-10, 10, 32)]
+        test = ga(rosen, bounds, popsize=10, coding='gray')
+        test.popInitialize()
+        test.popEvaluate()
+        test.selProportionate()
+        chromosome = [obj.chromosome for obj in test.population]
+        assert(chromosome == output)
+    
 # class TestGeneticAlgorithm:
     
 #     # ------------------------------------------------------------------------
